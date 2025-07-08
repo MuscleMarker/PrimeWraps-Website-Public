@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    command: doppler run -- java -jar app.jar
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80" # Expose port 80 for production web traffic
+    environment:
+      - NODE_ENV=production
+      # Set VITE_API_URL during build for production, e.g., to your backend's public URL
+      # - VITE_API_URL=http://your-backend-public-ip-or-domain:8080
+    restart: always

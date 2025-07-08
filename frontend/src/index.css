@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Gwendolyn:wght@700&family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-pink: #ffdcdc;
+  --primary-cream: #fff2eb;
+  --primary-peach: #ffe8cd;
+  --primary-coral: #ffd6ba;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', system-ui, sans-serif;
+  line-height: 1.6;
+  color: #374151;
+  background-color: #fff;
+}
+
+
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ffdcdc;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ffc7c7;
+}
+
+/* Smooth transitions */
+* {
+  transition: all 0.3s ease;
+}
+
+/* Custom button styles */
+.btn-primary {
+  @apply bg-primary-200 hover:bg-primary-300 text-gray-800 font-medium py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl;
+}
+
+.btn-secondary {
+  @apply bg-cream-200 hover:bg-cream-300 text-gray-800 font-medium py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl;
+}
+
+/* Gradient backgrounds */
+.gradient-primary {
+  background: linear-gradient(135deg, #ffdcdc 0%, #fff2eb 100%);
+}
+
+.gradient-secondary {
+  background: linear-gradient(135deg, #ffe8cd 0%, #ffd6ba 100%);
+}
+
+/* Card hover effects */
+.card-hover {
+  @apply transition-all duration-300 transform hover:scale-105 hover:shadow-xl;
+}
+
+/* Text gradients */
+.text-gradient {
+  background: linear-gradient(135deg, #ff7a7a 0%, #ffb294 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    font-family: 'Montserrat', system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md;
+  }
+  
+  .btn-secondary {
+    @apply bg-stone-100 hover:bg-stone-200 text-stone-800 font-medium py-3 px-6 rounded-lg transition-colors duration-200 border border-stone-200;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-rose-600 text-rose-600 hover:bg-rose-600 hover:text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200;
+  }
+  
+  .section-padding {
+    @apply py-20 px-4 sm:px-6 lg:px-8;
+  }
+  
+  .container-max {
+    @apply max-w-7xl mx-auto;
+  }
+  
+  .card {
+    @apply bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-stone-100;
+  }
+  
+  .gradient-bg {
+    @apply bg-gradient-to-br from-stone-50 to-rose-50;
+  }
+  
+  .text-gradient {
+    @apply bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent;
+  }
+}

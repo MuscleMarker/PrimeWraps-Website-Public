@@ -1,0 +1,36 @@
+backend/data/primewraps.mv.db
+backend/data/primewraps.trace.db
+SECURITY_CHECKLIST.md
+HEROKU_DEPLOYMENT.md
+DOPPLER_INTEGRATION.md
+setup.md
+
+# Node.js / Frontend
+node_modules/
+dist/
+build/
+.env
+.env.local
+.env.*.local
+    
+# Java / Backend
+target/
+.mvn/wrapper/maven-wrapper.jar 
+# Already there, but good to double check
+data/ 
+# If this directory contains sensitive local data or databases
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+.project
+.classpath
+.settings/
+
+# Operating System
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
