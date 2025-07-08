@@ -72,7 +72,7 @@ const Contact: React.FC = () => {
       };
 
       // Send the contact form data to the backend
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/contact/submit`, payload);
+      const response = await axios.post('/api/contact/submit', payload);
       
       if (response.data.success) {
         // Set success message and reset the form
