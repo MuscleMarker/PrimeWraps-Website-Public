@@ -2,7 +2,7 @@
 FROM node:18-alpine AS build
 
 # Install Doppler CLI
-RUN apk add --no-cache curl &&     curl -Ls https://cli.doppler.com/install.sh | sh
+RUN apk add --no-cache curl gnupg &&     curl -Ls https://cli.doppler.com/install.sh | sh
 
 WORKDIR /app
 
