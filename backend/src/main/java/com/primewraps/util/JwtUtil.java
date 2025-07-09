@@ -13,7 +13,6 @@ import jakarta.annotation.PostConstruct;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Utility class for JSON Web Token (JWT) operations.

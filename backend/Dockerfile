@@ -20,9 +20,10 @@ RUN ./mvnw package -DskipTests
 
 # Stage 2: Create the final, smaller image
 FROM eclipse-temurin:17-jre-alpine
-RUN apk update && apk add --no-cache 'libxml2>=2.13.4-r6'
 
 WORKDIR /app
+
+RUN apk update && apk add --no-cache 'libxml2>=2.13.4-r6'
 
 # Copy the packaged jar from the build stage
 COPY --from=build /app/target/prime-wraps-backend-0.0.1-SNAPSHOT.jar app.jar
