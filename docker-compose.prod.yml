@@ -1,4 +1,6 @@
-version: '3.8'
+secrets:
+  doppler_frontend_token:
+    environment: DOPPLER_TOKEN # This maps the host env var DOPPLER_TOKEN to a secret named doppler_frontend_token
 
 services:
   backend:
@@ -16,7 +18,7 @@ services:
     build:
       context: ./frontend
       secrets:
-        - DOPPLER_TOKEN
+        - doppler_frontend_token # Reference the top-level secret here
     ports:
       - "80:80"
     environment:
