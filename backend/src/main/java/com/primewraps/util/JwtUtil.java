@@ -1,20 +1,19 @@
 package com.primewraps.util;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.annotation.PostConstruct;
 
-import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Utility class for JSON Web Token (JWT) operations.
@@ -31,11 +30,17 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private long EXPIRATION_TIME;
 
+    private Algorithm algorithm;
+    private JWTVerifier verifier;
+
     @PostConstruct
-    public void validateSecret() {
+    public void init() {
         if (SECRET_KEY == null || SECRET_KEY.length() < 32) {
             throw new IllegalStateException("JWT secret key must be at least 32 characters long and set via environment variable.");
         }
+        this.algorithm = Algorithm.HMAC256(SECRET_KEY);
+        this.verifier = JWT.require(algorithm)
+                .build();
     }
 
     /**
@@ -44,8 +49,11 @@ public class JwtUtil {
      * @return The generated JWT string.
      */
     public String generateToken(String username) {
-        Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+        return JWT.create()
+                .withSubject(username)
+                .withIssuedAt(new Date(System.currentTimeMillis()))
+                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .sign(algorithm);
     }
 
     public String generateToken(UserDetails userDetails) {
@@ -53,32 +61,13 @@ public class JwtUtil {
         claims.put("roles", userDetails.getAuthorities().stream()
                 .map(grantedAuthority -> grantedAuthority.getAuthority())
                 .collect(java.util.stream.Collectors.toList()));
-        return createToken(claims, userDetails.getUsername());
-    }
 
-    /**
-     * Creates the JWT with specified claims and subject.
-     * @param claims Additional claims to be included in the JWT.
-     * @param subject The subject of the JWT (typically the username).
-     * @return The compact JWT string.
-     */
-    private String createToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(getSignKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-    /**
-     * Retrieves the signing key from the base64 encoded secret.
-     * @return The Key object used for signing JWTs.
-     */
-    private Key getSignKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-        return Keys.hmacShaKeyFor(keyBytes);
+        return JWT.create()
+                .withSubject(userDetails.getUsername())
+                .withIssuedAt(new Date(System.currentTimeMillis()))
+                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .withPayload(claims)
+                .sign(algorithm);
     }
 
     /**
@@ -90,13 +79,11 @@ public class JwtUtil {
      */
     public Boolean validateToken(String token, String username) {
         try {
-            final String extractedUsername = extractUsername(token);
-            return (extractedUsername.equals(username) && !isTokenExpired(token));
-        } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            // Token is expired
-            return false;
-        } catch (Exception e) {
-            // Other validation errors
+            DecodedJWT jwt = verifier.verify(token);
+            final String extractedUsername = jwt.getSubject();
+            return (extractedUsername.equals(username) && !isTokenExpired(jwt));
+        } catch (JWTVerificationException exception){
+            // Token is invalid or expired
             return false;
         }
     }
@@ -107,7 +94,8 @@ public class JwtUtil {
      * @return The username extracted from the token.
      */
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        DecodedJWT jwt = verifier.verify(token);
+        return jwt.getSubject();
     }
 
     /**
@@ -116,40 +104,16 @@ public class JwtUtil {
      * @return The expiration Date of the token.
      */
     public Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
-    }
-
-    /**
-     * Extracts a specific claim from the JWT.
-     * @param token The JWT string.
-     * @param claimsResolver A function to resolve the desired claim from the Claims object.
-     * @param <T> The type of the claim.
-     * @return The extracted claim.
-     */
-    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
-    }
-
-    /**
-     * Extracts all claims from a JWT token.
-     * @param token The JWT string.
-     * @return The Claims object containing all claims from the token.
-     */
-    private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSignKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        DecodedJWT jwt = verifier.verify(token);
+        return jwt.getExpiresAt();
     }
 
     /**
      * Checks if the JWT token is expired.
-     * @param token The JWT string.
+     * @param jwt The DecodedJWT object.
      * @return True if the token is expired, false otherwise.
      */
-    private Boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+    private Boolean isTokenExpired(DecodedJWT jwt) {
+        return jwt.getExpiresAt().before(new Date());
     }
 }

@@ -2,9 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: harjotdhanota/primewraps-backend:latest
     ports:
       - "8080:8080"
     command: doppler run -- java -jar app.jar
@@ -13,9 +11,7 @@ services:
     restart: always
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: harjotdhanota/primewraps-frontend:latest
     ports:
       - "80:80" # Expose port 80 for production web traffic
     environment:

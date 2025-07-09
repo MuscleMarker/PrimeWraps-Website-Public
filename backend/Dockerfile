@@ -19,7 +19,7 @@ COPY src src
 RUN ./mvnw package -DskipTests
 
 # Stage 2: Create the final, smaller image
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
