@@ -2,20 +2,23 @@ version: '3.8'
 
 services:
   backend:
-    image: harjotdhanota/primewraps-backend:latest
+    build:
+      context: ./backend
     ports:
       - "8080:8080"
-    command: doppler run -- java -jar app.jar
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+      - DOPPLER_TOKEN=${DOPPLER_BACKEND_TOKEN} # Inject token from environment
+    command: doppler run -- java -jar target/prime-wraps-0.0.1-SNAPSHOT.jar
     restart: always
 
   frontend:
-    image: harjotdhanota/primewraps-frontend:latest
+    build:
+      context: ./frontend
+      secrets:
+        - DOPPLER_TOKEN
     ports:
-      - "80:80" # Expose port 80 for production web traffic
+      - "80:80"
     environment:
       - NODE_ENV=production
-      # Set VITE_API_URL during build for production, e.g., to your backend's public URL
-      # - VITE_API_URL=http://your-backend-public-ip-or-domain:8080
     restart: always
