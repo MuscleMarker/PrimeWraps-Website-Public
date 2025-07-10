@@ -1,7 +1,3 @@
-secrets:
-  doppler_frontend_token:
-    environment: DOPPLER_TOKEN # This maps the host env var DOPPLER_TOKEN to a secret named doppler_frontend_token
-
 services:
   backend:
     build:
@@ -10,17 +6,17 @@ services:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - DOPPLER_TOKEN=${DOPPLER_BACKEND_TOKEN} # Inject token from environment
+      - DOPPLER_TOKEN=${DOPPLER_BACKEND_TOKEN}
     command: doppler run --config prd -- java -jar app.jar
     restart: always
 
   frontend:
     build:
       context: ./frontend
-      secrets:
-        - doppler_frontend_token # Reference the top-level secret here
     ports:
       - "80:80"
     environment:
       - NODE_ENV=production
+      - DOPPLER_TOKEN=${DOPPLER_FRONTEND_TOKEN}
+    command: doppler run --config prd -- npm run start
     restart: always
