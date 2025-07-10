@@ -85,7 +85,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 
                 // Allow all other requests (temporarily for debugging)
-                .anyRequest().permitAll()
+                .anyRequest().authenticated()
             )
             
             // Add the JWT authentication filter before the username/password filter

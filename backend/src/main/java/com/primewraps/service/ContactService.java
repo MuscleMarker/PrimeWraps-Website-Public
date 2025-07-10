@@ -5,7 +5,6 @@ import com.primewraps.model.Contact;
 import com.primewraps.repository.ContactRepository;
 import com.sendgrid.SendGrid;
 import com.sendgrid.Request;
-import com.sendgrid.Response;
 import com.sendgrid.Method;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
@@ -57,7 +56,7 @@ public class ContactService {
             sendGridRequest.setMethod(Method.POST);
             sendGridRequest.setEndpoint("mail/send");
             sendGridRequest.setBody(mail.build());
-            Response response = sendGrid.api(sendGridRequest);
+            sendGrid.api(sendGridRequest);
             // Optionally log response.getStatusCode(), response.getBody(), response.getHeaders()
         } catch (Exception ex) {
             // Optionally log or handle the exception
