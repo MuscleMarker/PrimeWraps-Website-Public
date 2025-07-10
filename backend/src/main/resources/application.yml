@@ -45,7 +45,7 @@ server:
 
 # JWT Configuration
 jwt:
-  secret: ${JWT_SECRET}
+  secret: ${JWT_SECRET:default-secret-key-for-development}
   expiration: 86400000 # 24 hours
 
 # CORS Configuration
@@ -58,4 +58,6 @@ cors:
 logging:
   level:
     com.primewraps: DEBUG
-    org.springframework.security: TRACE 
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security.web: DEBUG 

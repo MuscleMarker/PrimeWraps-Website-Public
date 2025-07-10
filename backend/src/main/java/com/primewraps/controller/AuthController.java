@@ -29,12 +29,23 @@ public class AuthController {
     private Bucket loginBucket;
 
     /**
+     * Simple test endpoint to verify the controller is accessible.
+     * @return A simple response to confirm the endpoint is accessible.
+     */
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        logger.info("Test endpoint reached successfully");
+        return ResponseEntity.ok("Auth controller is working - GET request");
+    }
+
+    /**
      * Registers a new user.
      * @param request The authentication request, containing username and password.
      * @return A response containing a JWT token and a success message.
      */
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody AuthRequest request) {
+        logger.info("Register request received for username: {}", request.getUsername());
         return ResponseEntity.ok(authService.register(request));
     }
 
@@ -46,7 +57,7 @@ public class AuthController {
     @PostMapping("/debug")
     public ResponseEntity<String> debug() {
         logger.info("Debug endpoint reached successfully");
-        return ResponseEntity.ok("Debug endpoint is working");
+        return ResponseEntity.ok("Debug endpoint is working - POST request");
     }
 
     /**

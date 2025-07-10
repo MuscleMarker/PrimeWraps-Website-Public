@@ -47,11 +47,20 @@ public class ContactController {
     }
 
     /**
-     * Health check endpoint for the contact service.
-     * @return A response indicating that the service is running.
+     * Health check endpoint to verify the application is running.
+     * @return A simple health status response.
      */
     @GetMapping("/health")
     public ResponseEntity<String> health() {
-        return ResponseEntity.ok("Contact service is running");
+        return ResponseEntity.ok("Contact controller is healthy");
+    }
+
+    /**
+     * Simple test endpoint to verify the controller is accessible.
+     * @return A simple response to confirm the endpoint is accessible.
+     */
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("Contact controller is working - GET request");
     }
 }

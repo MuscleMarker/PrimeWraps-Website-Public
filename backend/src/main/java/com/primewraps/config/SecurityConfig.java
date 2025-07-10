@@ -2,6 +2,7 @@ package com.primewraps.config;
 
 import com.primewraps.filter.JwtAuthFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,7 +11,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,22 +18,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.core.env.Profiles;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import java.util.Arrays;
 
 /**
- * Security configuration for the application.
+ * Security configuration for the Prime Wraps application.
  * This class enables web security and configures CORS, CSRF, session management, and authorization rules.
  */
 @Configuration
@@ -41,76 +33,20 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
-
     @Autowired
     private JwtAuthFilter jwtAuthFilter;
 
-    @Autowired
-    private org.springframework.core.env.Environment environment;
-
     @Value("${cors.allowed-origins}")
-    private String[] allowedOrigins;
+    private String allowedOrigins;
 
     @Value("${cors.allowed-methods}")
-    private String[] allowedMethods;
+    private String allowedMethods;
 
     @Value("${cors.allowed-headers}")
-    private String[] allowedHeaders;
+    private String allowedHeaders;
 
     /**
-     * Provides a custom UserDetailsService bean.
-     * @return An instance of CustomUserDetailsService.
-     */
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return new CustomUserDetailsService();
-    }
-
-    /**
-     * Configures the security filter chain.
-     * @param http The HttpSecurity object to configure.
-     * @return The configured SecurityFilterChain.
-     * @throws Exception If an error occurs during configuration.
-     */
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            // Configure CORS
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            // Disable CSRF protection
-            .csrf(csrf -> {
-                if (environment.acceptsProfiles(Profiles.of("dev"))) {
-                    csrf.disable();
-                }
-            })
-            // Configure authorization rules - temporarily more permissive
-            .authorizeHttpRequests(authz -> {
-                if (environment.acceptsProfiles(Profiles.of("dev"))) {
-                    authz.requestMatchers("/h2-console/**").permitAll();
-                }
-                authz
-                .requestMatchers("/api/**").permitAll() // Temporarily allow all API endpoints
-                .requestMatchers("/error").permitAll()
-                .anyRequest().authenticated();
-            })
-            // Configure session management to be stateless
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            // Set the custom authentication provider
-            .authenticationProvider(authenticationProvider())
-            // Add the JWT authentication filter before the username/password filter
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
-        // Allow frames for H2 console in dev profile
-        if (environment.acceptsProfiles(Profiles.of("dev"))) {
-            http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
-        }
-        
-        return http.build();
-    }
-    
-    /**
-     * Provides a password encoder bean.
+     * Configures the password encoder for the application.
      * @return A BCryptPasswordEncoder instance.
      */
     @Bean
@@ -119,21 +55,63 @@ public class SecurityConfig {
     }
 
     /**
-     * Provides an authentication provider bean.
-     * @return A DaoAuthenticationProvider instance.
+     * Configures the security filter chain.
+     * This method sets up the security rules for the application.
+     * @param http The HttpSecurity object to configure.
+     * @return The configured SecurityFilterChain.
      */
     @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailsService());
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
-        return authenticationProvider;
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            // Disable CSRF for API endpoints
+            .csrf(csrf -> csrf.disable())
+            
+            // Configure CORS
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            
+            // Configure session management
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            
+            // Configure authorization rules
+            .authorizeHttpRequests(auth -> auth
+                // Allow all requests to auth and contact endpoints
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/contact/**").permitAll()
+                
+                // Allow H2 console in development
+                .requestMatchers("/h2-console/**").permitAll()
+                
+                // Require authentication for admin endpoints
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                
+                // Allow all other requests (temporarily for debugging)
+                .anyRequest().permitAll()
+            )
+            
+            // Add the JWT authentication filter before the username/password filter
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
     }
 
     /**
-     * Provides an AuthenticationManager bean.
-     * @param config The AuthenticationConfiguration object.
-     * @return An AuthenticationManager instance.
-     * @throws Exception If an error occurs.
+     * Configures the authentication provider.
+     * @param userDetailsService The user details service.
+     * @param passwordEncoder The password encoder.
+     * @return A configured AuthenticationProvider.
+     */
+    @Bean
+    public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder);
+        return provider;
+    }
+
+    /**
+     * Configures the authentication manager.
+     * @param config The authentication configuration.
+     * @return A configured AuthenticationManager.
      */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
@@ -147,9 +125,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of(allowedOrigins));
-        configuration.setAllowedMethods(List.of(allowedMethods));
-        configuration.setAllowedHeaders(List.of(allowedHeaders));
+        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+        configuration.setAllowedMethods(Arrays.asList(allowedMethods.split(",")));
+        configuration.setAllowedHeaders(Arrays.asList(allowedHeaders.split(",")));
         configuration.setAllowCredentials(true);
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
