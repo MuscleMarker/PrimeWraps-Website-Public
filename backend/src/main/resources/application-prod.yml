@@ -1,10 +1,14 @@
 spring:
+  profiles: prod
   application:
     name: prime-wraps-backend
   
   # Database Configuration for Supabase PostgreSQL
   datasource:
     url: ${DB_URL}
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   
   # JPA Configuration
   jpa:
