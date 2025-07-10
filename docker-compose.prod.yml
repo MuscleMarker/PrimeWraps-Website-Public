@@ -16,7 +16,7 @@ services:
       args:
         - DOPPLER_TOKEN=${DOPPLER_FRONTEND_TOKEN}
     ports:
-      - "80:80"
+      - "8081:80"
     environment:
       - NODE_ENV=production
     restart: always
