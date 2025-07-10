@@ -18,20 +18,12 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: false
-  
-  # Mail Configuration
-  mail:
-    host: ${SPRING_MAIL_HOST}
-    port: ${SPRING_MAIL_PORT}
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-    recipient: ${MAIL_RECIPIENT}
+
+# SendGrid Configuration
+sendgrid:
+  api:
+    key: ${SENDGRID_API_KEY}
+  recipient: ${SENDGRID_RECIPIENT}
 
 # Server Configuration
 server:

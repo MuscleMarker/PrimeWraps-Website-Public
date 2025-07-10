@@ -3,10 +3,15 @@ package com.primewraps.service;
 import com.primewraps.dto.ContactRequest;
 import com.primewraps.model.Contact;
 import com.primewraps.repository.ContactRepository;
+import com.sendgrid.SendGrid;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
+import com.sendgrid.Method;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,13 +22,13 @@ import org.springframework.stereotype.Service;
 public class ContactService {
 
     @Autowired
-    private JavaMailSender mailSender;
+    private SendGrid sendGrid;
 
     @Autowired
     private ContactRepository contactRepository;
 
     // Injects the recipient email address from application properties
-    @Value("${spring.mail.recipient}")
+    @Value("${sendgrid.recipient}")
     private String recipientEmail;
 
     /**
@@ -40,14 +45,24 @@ public class ContactService {
         contact.setMessage(request.getMessage());
         contactRepository.save(contact);
 
-        // Prepare and send the email notification
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(recipientEmail);
-        message.setSubject("New Contact Form Submission - " + request.getName());
-        message.setText(createEmailContent(request));
-        message.setFrom("Inquiry@primewraps.co"); // Sender email address
-        
-        mailSender.send(message);
+        // Prepare and send the email notification using SendGrid
+        Email from = new Email("Inquiry@primewraps.co");
+        Email to = new Email(recipientEmail);
+        String subject = "New Contact Form Submission - " + request.getName();
+        Content content = new Content("text/plain", createEmailContent(request));
+        Mail mail = new Mail(from, subject, to, content);
+
+        Request sendGridRequest = new Request();
+        try {
+            sendGridRequest.setMethod(Method.POST);
+            sendGridRequest.setEndpoint("mail/send");
+            sendGridRequest.setBody(mail.build());
+            Response response = sendGrid.api(sendGridRequest);
+            // Optionally log response.getStatusCode(), response.getBody(), response.getHeaders()
+        } catch (Exception ex) {
+            // Optionally log or handle the exception
+            throw new RuntimeException("Failed to send email via SendGrid", ex);
+        }
     }
 
     /**
