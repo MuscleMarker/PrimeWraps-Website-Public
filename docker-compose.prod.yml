@@ -11,7 +11,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - DOPPLER_TOKEN=${DOPPLER_BACKEND_TOKEN} # Inject token from environment
-    command: doppler run -- java -jar target/prime-wraps-0.0.1-SNAPSHOT.jar
+    command: doppler run -- java -jar app.jar
     restart: always
 
   frontend:
