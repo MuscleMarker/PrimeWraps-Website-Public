@@ -13,10 +13,10 @@ services:
   frontend:
     build:
       context: ./frontend
+      args:
+        - DOPPLER_TOKEN=${DOPPLER_FRONTEND_TOKEN}
     ports:
       - "80:80"
     environment:
       - NODE_ENV=production
-      - DOPPLER_TOKEN=${DOPPLER_FRONTEND_TOKEN}
-    command: doppler run --config prd -- npm run start
     restart: always

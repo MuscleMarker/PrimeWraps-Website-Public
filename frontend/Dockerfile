@@ -16,8 +16,9 @@ COPY . .
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
 
-# Build the application with Doppler using environment variable
-RUN doppler run -- npm run build
+# Build the application with Doppler using build argument
+ARG DOPPLER_TOKEN
+RUN doppler run --token=$DOPPLER_TOKEN -- npm run build
 
 # Stage 2: Serve the static files with Nginx
 FROM nginx:stable-alpine
