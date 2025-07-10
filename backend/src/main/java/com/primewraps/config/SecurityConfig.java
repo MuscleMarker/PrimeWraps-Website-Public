@@ -23,6 +23,12 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.core.env.Profiles;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -34,6 +40,8 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Autowired
     private JwtAuthFilter jwtAuthFilter;
@@ -76,16 +84,14 @@ public class SecurityConfig {
                     csrf.disable();
                 }
             })
-            // Configure authorization rules
+            // Configure authorization rules - temporarily more permissive
             .authorizeHttpRequests(authz -> {
                 if (environment.acceptsProfiles(Profiles.of("dev"))) {
                     authz.requestMatchers("/h2-console/**").permitAll();
                 }
                 authz
-                .requestMatchers("/api/auth/**", "/auth/**").permitAll()
-                .requestMatchers("/api/contact/**", "/contact/**").permitAll()
+                .requestMatchers("/api/**").permitAll() // Temporarily allow all API endpoints
                 .requestMatchers("/error").permitAll()
-                .requestMatchers("/api/admin/**", "/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated();
             })
             // Configure session management to be stateless
