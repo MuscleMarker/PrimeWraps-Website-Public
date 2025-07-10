@@ -68,8 +68,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            // Temporarily disable CORS for testing
-            .cors(cors -> cors.disable())
+            // Configure CORS
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             // Disable CSRF protection
             .csrf(csrf -> {
                 if (environment.acceptsProfiles(Profiles.of("dev"))) {

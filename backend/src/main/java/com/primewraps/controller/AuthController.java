@@ -39,6 +39,17 @@ public class AuthController {
     }
 
     /**
+     * Temporary debug endpoint to test if requests are reaching the controller.
+     * This should be removed after debugging.
+     * @return A simple response to confirm the endpoint is accessible.
+     */
+    @PostMapping("/debug")
+    public ResponseEntity<String> debug() {
+        logger.info("Debug endpoint reached successfully");
+        return ResponseEntity.ok("Debug endpoint is working");
+    }
+
+    /**
      * Authenticates a user and returns a JWT token.
      * @param request The authentication request, containing username and password.
      * @return A response containing a JWT token and a success message.

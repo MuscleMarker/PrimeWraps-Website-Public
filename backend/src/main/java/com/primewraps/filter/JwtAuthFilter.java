@@ -14,6 +14,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -23,6 +25,8 @@ import java.io.IOException;
  */
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthFilter.class);
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -41,6 +45,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
+        logger.info("JWT Filter processing request: {} {}", request.getMethod(), request.getRequestURI());
+        
         String authHeader = request.getHeader("Authorization");
         String token = null;
         String username = null;
@@ -61,6 +67,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
+        
+        logger.info("JWT Filter continuing to next filter for: {} {}", request.getMethod(), request.getRequestURI());
         filterChain.doFilter(request, response); // Continue with the filter chain
     }
 
@@ -74,6 +82,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        return path.startsWith("/api/auth/") || path.startsWith("/api/contact/");
+        boolean shouldSkip = path.startsWith("/api/auth/") || path.startsWith("/api/contact/");
+        logger.info("JWT Filter shouldNotFilter check for {}: {}", path, shouldSkip);
+        return shouldSkip;
     }
 }
