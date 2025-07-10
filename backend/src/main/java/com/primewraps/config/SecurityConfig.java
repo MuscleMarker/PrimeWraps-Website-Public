@@ -84,7 +84,7 @@ public class SecurityConfig {
                 // Require authentication for admin endpoints
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 
-                // Allow all other requests (temporarily for debugging)
+                // Require authentication for all other requests
                 .anyRequest().authenticated()
             )
             
