@@ -31,8 +31,8 @@ COPY --from=build /app/target/prime-wraps-backend-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8080
 
 # Install Doppler CLI
-RUN apk add --no-cache curl
-RUN curl -sLf --retry 3 --retry-delay 2 https://downloads.doppler.com/cli/install.sh | sh
+RUN apk add --no-cache curl gnupg
+RUN curl -Ls https://cli.doppler.com/install.sh | sh
 
 # Use doppler run to inject secrets and run the application
 CMD ["doppler", "run", "--", "java", "-jar", "app.jar"]
