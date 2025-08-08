@@ -1,83 +1,62 @@
-# Prime Wraps Website
+## Prime Wraps Website
 
-A website built with React frontend and Spring Boot backend.
+A production-grade full‑stack website for Prime Wraps. React + TypeScript frontend, Spring Boot backend, containerized with Docker, secrets managed by Doppler, deployed on DigitalOcean, and backed by Supabase PostgreSQL. Email delivery via SendGrid.
 
-## Tech Stack
+### Tech Stack
 
-### Backend
-- **Java 17+** with **Spring Boot 3.x**
-- **Spring Web** - RESTful APIs
-- **Spring Data JPA** - Database operations
-- **Spring Security** - Authentication
-- **H2 Database** (dev) / **PostgreSQL** (prod)
-- **Maven** - Dependency management
+- **Frontend**
+  - React 18 + TypeScript
+  - Vite (build/dev server)
+  - Tailwind CSS
+  - React Router v6
+  - Axios
+  - Framer Motion (animations)
+  - lucide-react (icons)
+  - date-fns
+  - ESLint + TypeScript ESLint
 
-### Frontend
-- **React 18** with **TypeScript**
-- **Vite** - Build tool and dev server
-- **Tailwind CSS** - Styling
-- **React Router** - Client-side routing
-- **Axios** - HTTP client
+- **Backend**
+  - Java 17, Spring Boot 3.5
+  - Spring Web (REST APIs)
+  - Spring Data JPA
+  - Spring Security (stateless) with JWT
+  - Bean Validation
+  - Rate limiting with Bucket4j
+  - OpenAPI/Swagger UI via springdoc-openapi
+  - Maven (build/deps)
 
-## Project Structure
+- **Data & Messaging**
+  - H2 (in-memory) for local development
+  - PostgreSQL on Supabase for production
+  - SendGrid for transactional email
+
+- **DevOps & Hosting**
+  - Docker (multi-stage images)
+  - Docker Compose (dev and prod)
+  - Nginx (serves static frontend)
+  - Doppler (secrets and config injection)
+  - DigitalOcean (deployment/hosting)
+
+### Key Features
+
+- Modern, responsive UI with smooth animations
+- Authenticated admin area (JWT, BCrypt hashing)
+- Contact form with rate limiting and email notifications
+- Secure CORS configuration and stateless APIs
+
+### Project Structure
 
 ```
-prime-wraps-website/
+Prime Wraps Website Public/
 ├── backend/                 # Spring Boot application
 │   ├── src/
 │   ├── pom.xml
 │   └── Dockerfile
-├── frontend/               # React application
+├── frontend/                # React + Vite application (served by Nginx in prod)
 │   ├── src/
 │   ├── package.json
 │   └── Dockerfile
-├── docker-compose.yml      # Development environment
+├── docker-compose.yml       # Dev environment (backend + frontend + Postgres)
+├── docker-compose.prod.yml  # Production services (Doppler-integrated)
 └── README.md
 ```
-
-## Quick Start
-
-### Prerequisites
-- Java 17+
-- Node.js 18+
-- Docker (optional)
-
-### Development Setup
-
-1. **Backend Setup:**
-   ```bash
-   cd backend
-   ./mvnw spring-boot:run
-   ```
-
-2. **Frontend Setup:**
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
-
-3. **Docker Setup (Alternative):**
-   ```bash
-   docker-compose up
-   ```
-
-## Features
-
-- Modern, responsive UI
-- RESTful API backend
-- Database integration
-- Authentication system
-- Contact forms
-- Product showcase
-- About/Company information
-
-## Development
-
-- Backend runs on: http://localhost:8080
-- Frontend runs on: http://localhost:5173
-- API documentation: http://localhost:8080/swagger-ui.html
-
-## Deployment
-
-The application can be deployed using Docker containers or traditional deployment methods. 
