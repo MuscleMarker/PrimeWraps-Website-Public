@@ -23,7 +23,6 @@ const Navbar: React.FC = () => {
   const navItems = [
     { name: 'Home', path: '/' },
     { name: 'Services', path: '/services' },
-    { name: 'Gallery', path: '/gallery' },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' },
   ];
@@ -92,7 +91,7 @@ const Navbar: React.FC = () => {
             >
               Get Quote
             </Link>
-            {isLoggedIn ? (
+            {isLoggedIn && (
               <div className="relative group">
                 <button className="flex items-center space-x-2 text-gray-700 hover:text-primary-500 transition-colors">
                   <User size={18} />
@@ -115,14 +114,6 @@ const Navbar: React.FC = () => {
                   </button>
                 </div>
               </div>
-            ) : (
-              <Link
-                to="/login"
-                className="flex items-center space-x-2 text-gray-700 hover:text-primary-500 transition-colors"
-              >
-                <User size={18} />
-                <span className="text-sm">Login</span>
-              </Link>
             )}
           </div>
 
@@ -159,7 +150,7 @@ const Navbar: React.FC = () => {
         {isOpen && (
           <div className="md:hidden bg-white/95 backdrop-blur-md border-t border-primary-200">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              {navItems.map((item) => (
+                {navItems.map((item) => (
                 <Link
                   key={item.name}
                   to={item.path}
@@ -176,7 +167,7 @@ const Navbar: React.FC = () => {
               >
                 Get Quote
               </Link>
-              {isLoggedIn ? (
+              {isLoggedIn && (
                 <>
                   <Link
                     to="/admin/dashboard"
@@ -194,15 +185,6 @@ const Navbar: React.FC = () => {
                     Logout
                   </button>
                 </>
-              ) : (
-                <Link
-                  to="/login"
-                  className="flex items-center space-x-2 text-gray-700 hover:text-primary-500 transition-colors"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <User size={18} />
-                  <span>Employee Login</span>
-                </Link>
               )}
               <div className="px-3 py-2">
                 <a 
