@@ -46,7 +46,7 @@ export default {
       },
       fontFamily: {
         sans: ['Montserrat', 'system-ui', 'sans-serif'],
-        gwendolyn: ['Gwendolyn', 'cursive'],
+        gwendolyn: ['"palast-variable"', 'sans-serif'],
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',

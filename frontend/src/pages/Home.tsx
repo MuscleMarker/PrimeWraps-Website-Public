@@ -62,7 +62,7 @@ const Home: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-primary-200/20 to-cream-200/20 opacity-60"></div>
         
         <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-          <h1 className="text-9xl md:text-9xl font-bold text-gray-800 font-gwendolyn leading-tight mb-6">
+          <h1 className="text-9xl md:text-9xl text-gray-800 font-brand leading-tight mb-6">
             Prime Wraps
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">

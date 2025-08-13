@@ -137,3 +137,17 @@ body {
     @apply bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent;
   }
 }
+
+@layer utilities {
+  .font-brand {
+    font-family: "palast-variable", sans-serif;
+    font-style: italic;
+    font-variation-settings: 'wght' 650, 'opsz' 93;
+    font-optical-sizing: auto;
+  }
+  .font-gwendolyn {
+    font-style: normal;
+    font-optical-sizing: auto;
+    font-variation-settings: 'wght' 400, 'opsz' 93;
+  }
+}
