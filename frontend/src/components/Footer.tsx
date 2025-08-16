@@ -54,7 +54,7 @@ const Footer: React.FC = () => {
               <li><Link to="/" className="text-gray-600 hover:text-primary-500 transition-colors duration-200">Home</Link></li>
               <li><Link to="/about" className="text-gray-600 hover:text-primary-500 transition-colors duration-200">About</Link></li>
               <li><Link to="/services" className="text-gray-600 hover:text-primary-500 transition-colors duration-200">Services</Link></li>
-              <li><Link to="/gallery" className="text-gray-600 hover:text-primary-500 transition-colors duration-200">Gallery</Link></li>
+              {/*<li><Link to="/gallery" className="text-gray-600 hover:text-primary-500 transition-colors duration-200">Gallery</Link></li>*/}
               <li><Link to="/contact" className="text-gray-600 hover:text-primary-500 transition-colors duration-200">Contact</Link></li>
             </ul>
           </div>
@@ -93,7 +93,7 @@ const Footer: React.FC = () => {
         <div className="border-t border-primary-200 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           {/* Copyright Notice */}
           <p className="text-gray-600 text-sm">
-            © 2024 Prime Wraps. All rights reserved.
+            © 2025 Prime Wraps. All rights reserved.
           </p>
           {/* Legal Links */}
           <div className="flex space-x-6 mt-4 md:mt-0">

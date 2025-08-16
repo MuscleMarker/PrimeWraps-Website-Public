@@ -75,12 +75,12 @@ const Home: React.FC = () => {
             >
               Request a Quote
             </Link>
-            <Link 
+            {/*<Link 
               to="/gallery" 
               className="bg-white hover:bg-gray-50 text-gray-800 font-semibold py-4 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg"
             >
-              View Our Work
-            </Link>
+              View Our Portfolio
+            </Link>*/}
           </div>
         </div>
 
@@ -186,12 +186,12 @@ const Home: React.FC = () => {
             >
               Get Started Today
             </Link>
-            <Link 
+            {/*<Link 
               to="/gallery" 
               className="bg-white hover:bg-gray-50 text-gray-800 font-semibold py-4 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg"
             >
               View Our Portfolio
-            </Link>
+            </Link>*/}
           </div>
         </div>
       </section>
