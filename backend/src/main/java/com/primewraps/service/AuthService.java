@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -105,5 +106,14 @@ public class AuthService {
         userRepository.save(newUser);
         String token = jwtUtil.generateToken(newUser.getUsername());
         return new AuthResponse(token, "User created successfully");
+    }
+
+    /**
+     * Retrieves all users from the database.
+     * This method is typically used by admins to view all users.
+     * @return A list of all users.
+     */
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 }

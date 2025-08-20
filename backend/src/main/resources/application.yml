@@ -12,18 +12,22 @@ spring:
   # JPA Configuration
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.H2Dialect
+        jdbc:
+          time_zone: America/Los_Angeles
   
   # H2 Console (for development)
   h2:
     console:
       enabled: true
       path: /h2-console
+      settings:
+        web-allow-others: false
   
   # Mail Configuration (for contact forms)
   mail:
@@ -39,25 +43,29 @@ spring:
             enable: true
     recipient: ${MAIL_RECIPIENT}
 
+  # Timezone Configuration
+  jackson:
+    time-zone: America/Los_Angeles
+
 # Server Configuration
 server:
   port: 8080
 
 # JWT Configuration
 jwt:
-  secret: ${JWT_SECRET:default-secret-key-for-development}
+  secret: ${JWT_SECRET}
   expiration: 86400000 # 24 hours
 
 # CORS Configuration
 cors:
   allowed-origins: http://localhost:5173,http://localhost:3000
-  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
-  allowed-headers: "*"
+  allowed-methods: GET,POST,PUT,DELETE,PATCH,OPTIONS
+  allowed-headers: "Authorization,Content-Type,X-Requested-With"
 
 # Logging
 logging:
   level:
-    com.primewraps: DEBUG
-    org.springframework.security: DEBUG
-    org.springframework.web: DEBUG
-    org.springframework.security.web: DEBUG 
+    com.primewraps: INFO
+    org.springframework.security: INFO
+    org.springframework.web: INFO
+    org.springframework.security.web: INFO 

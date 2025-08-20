@@ -88,6 +88,11 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             
+            // Configure headers for H2 console
+            .headers(headers -> headers
+                .frameOptions(frameOptions -> frameOptions.sameOrigin())
+            )
+            
             // Add the JWT authentication filter before the username/password filter
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

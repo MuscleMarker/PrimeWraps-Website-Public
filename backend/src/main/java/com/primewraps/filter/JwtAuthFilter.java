@@ -82,7 +82,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        boolean shouldSkip = path.startsWith("/api/auth/") || path.startsWith("/api/contact/");
+        // Skip login and register, but allow /me endpoint
+        boolean shouldSkip = (path.startsWith("/api/auth/") && !path.equals("/api/auth/me")) || path.startsWith("/api/contact/");
         logger.info("JWT Filter shouldNotFilter check for {}: {}", path, shouldSkip);
         return shouldSkip;
     }

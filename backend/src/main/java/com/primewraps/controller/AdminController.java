@@ -83,6 +83,20 @@ public class AdminController {
     }
 
     /**
+     * Retrieves all users.
+     * @return A list of all users.
+     */
+    @GetMapping("/users")
+    public ResponseEntity<List<com.primewraps.model.User>> getAllUsers() {
+        try {
+            List<com.primewraps.model.User> users = authService.getAllUsers();
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
      * Creates a new user.
      * @param request The user creation request, containing username, password, and roles.
      * @return A response containing a JWT token and a success message, or an error message.

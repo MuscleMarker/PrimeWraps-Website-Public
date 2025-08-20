@@ -3,6 +3,10 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import UserManagement from '../components/UserManagement';
+import ExpenseManagement from '../components/ExpenseManagement';
+import SettlementCalculator from '../components/SettlementCalculator';
+import SettlementPayment from '../components/SettlementPayment';
+import JobManagement from '../components/JobManagement';
 
 // Enum for contact status
 enum ContactStatus {
@@ -33,6 +37,8 @@ const AdminDashboard: React.FC = () => {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'contacts' | 'expenses' | 'settlements' | 'payments' | 'jobs' | 'users'>('contacts');
+  const [settlementRefreshTrigger, setSettlementRefreshTrigger] = useState(0);
   const navigate = useNavigate();
 
   /**
@@ -88,6 +94,20 @@ const AdminDashboard: React.FC = () => {
   useEffect(() => {
     fetchContacts();
   }, [fetchContacts]);
+
+  // Listen for expense updates to trigger settlement refresh
+  useEffect(() => {
+    const handleExpenseUpdate = (e: CustomEvent) => {
+      console.log('AdminDashboard received expenseUpdated event:', e.detail);
+      if (e.detail === 'expenseUpdated') {
+        console.log('Triggering settlement refresh from AdminDashboard...');
+        setSettlementRefreshTrigger(prev => prev + 1);
+      }
+    };
+
+    window.addEventListener('expenseUpdated', handleExpenseUpdate as EventListener);
+    return () => window.removeEventListener('expenseUpdated', handleExpenseUpdate as EventListener);
+  }, []);
 
   /**
    * Handles changing the status of a contact.
@@ -161,6 +181,13 @@ const AdminDashboard: React.FC = () => {
     navigate('/login');
   };
 
+  /**
+   * Handles payment completion to refresh settlements.
+   */
+  const handlePaymentComplete = () => {
+    setSettlementRefreshTrigger(prev => prev + 1);
+  };
+
   // Display loading message while fetching data
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center bg-[#FFF2EB] text-gray-700">Loading contacts...</div>;
@@ -184,65 +211,161 @@ const AdminDashboard: React.FC = () => {
           </button>
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Contact Submissions</h2>
+        {/* Navigation Tabs */}
+        <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">
+          <button
+            onClick={() => setActiveTab('contacts')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              activeTab === 'contacts'
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            Contact Submissions
+          </button>
+          <button
+            onClick={() => setActiveTab('expenses')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              activeTab === 'expenses'
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            Expense Management
+          </button>
+          <button
+            onClick={() => setActiveTab('settlements')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              activeTab === 'settlements'
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            Settlements
+          </button>
+          <button
+            onClick={() => setActiveTab('payments')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              activeTab === 'payments'
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            Payments
+          </button>
+          <button
+            onClick={() => setActiveTab('jobs')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              activeTab === 'jobs'
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            Job Management
+          </button>
+          <button
+            onClick={() => setActiveTab('users')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              activeTab === 'users'
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            User Management
+          </button>
+        </div>
 
-        {contacts.length === 0 ? (
-          <p className="text-gray-600">No contact submissions found.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white rounded-lg shadow overflow-hidden">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">ID</th>
-                  <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Name</th>
-                  <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Email</th>
-                  <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Phone</th>
-                  <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Service</th>
-                  <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Message</th>
-                  <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Submitted</th>
-                  <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Status</th>
-                  <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {contacts.map((contact) => (
-                  <tr key={contact.id} className="border-t border-gray-200 hover:bg-gray-50">
-                    <td className="py-3 px-4 text-sm text-gray-700">{contact.id}</td>
-                    <td className="py-3 px-4 text-sm text-gray-700">{contact.name}</td>
-                    <td className="py-3 px-4 text-sm text-gray-700">{contact.email}</td>
-                    <td className="py-3 px-4 text-sm text-gray-700">{contact.phone}</td>
-                    <td className="py-3 px-4 text-sm text-gray-700">{contact.service}</td>
-                    <td className="py-3 px-4 text-sm text-gray-700">{contact.message}</td>
-                    <td className="py-3 px-4 text-sm text-gray-700">{format(new Date(contact.submissionTime), 'MMM dd, yyyy HH:mm')}</td>
-                    <td className="py-3 px-4 text-sm text-gray-700">
-                      <select
-                        value={contact.status}
-                        onChange={(e) => handleStatusChange(contact.id, e.target.value as ContactStatus)}
-                        className="p-2 border border-gray-300 rounded-md"
-                      >
-                        <option value="PENDING">Pending</option>
-                        <option value="REVIEWED">Reviewed</option>
-                        <option value="ARCHIVED">Archived</option>
-                      </select>
-                    </td>
-                    <td className="py-3 px-4 text-sm text-gray-700">
-                      <button
-                        onClick={() => handleDelete(contact.id)}
-                        className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded-lg text-xs transition-colors"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        {/* Tab Content */}
+        {activeTab === 'contacts' && (
+          <>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">Contact Submissions</h2>
+            {contacts.length === 0 ? (
+              <p className="text-gray-600">No contact submissions found.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full bg-white rounded-lg shadow overflow-hidden">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">ID</th>
+                      <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Name</th>
+                      <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Email</th>
+                      <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Phone</th>
+                      <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Service</th>
+                      <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Message</th>
+                      <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Submitted</th>
+                      <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Status</th>
+                      <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {contacts.map((contact) => (
+                      <tr key={contact.id} className="border-t border-gray-200 hover:bg-gray-50">
+                        <td className="py-3 px-4 text-sm text-gray-700">{contact.id}</td>
+                        <td className="py-3 px-4 text-sm text-gray-700">{contact.name}</td>
+                        <td className="py-3 px-4 text-sm text-gray-700">{contact.email}</td>
+                        <td className="py-3 px-4 text-sm text-gray-700">{contact.phone}</td>
+                        <td className="py-3 px-4 text-sm text-gray-700">{contact.service}</td>
+                        <td className="py-3 px-4 text-sm text-gray-700">{contact.message}</td>
+                        <td className="py-3 px-4 text-sm text-gray-700">{new Date(contact.submissionTime).toLocaleDateString('en-US', {
+                          timeZone: 'America/Los_Angeles',
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}</td>
+                        <td className="py-3 px-4 text-sm text-gray-700">
+                          <select
+                            value={contact.status}
+                            onChange={(e) => handleStatusChange(contact.id, e.target.value as ContactStatus)}
+                            className="p-2 border border-gray-300 rounded-md"
+                          >
+                            <option value="PENDING">Pending</option>
+                            <option value="REVIEWED">Reviewed</option>
+                            <option value="ARCHIVED">Archived</option>
+                          </select>
+                        </td>
+                        <td className="py-3 px-4 text-sm text-gray-700">
+                          <button
+                            onClick={() => handleDelete(contact.id)}
+                            className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded-lg text-xs transition-colors"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
         )}
 
-        <div className="mt-8">
-          <UserManagement />
-        </div>
+        {activeTab === 'expenses' && (
+          <ExpenseManagement />
+        )}
+
+        {activeTab === 'settlements' && (
+          <SettlementCalculator refreshTrigger={settlementRefreshTrigger} />
+        )}
+
+        {activeTab === 'payments' && (
+          <SettlementPayment 
+            refreshTrigger={settlementRefreshTrigger} 
+            onPaymentComplete={handlePaymentComplete} 
+          />
+        )}
+
+        {activeTab === 'jobs' && (
+          <JobManagement />
+        )}
+
+        {activeTab === 'users' && (
+          <div className="mt-8">
+            <UserManagement />
+          </div>
+        )}
       </div>
     </div>
   );
